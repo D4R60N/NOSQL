@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 from pymongo import MongoClient
 
 mongo_user = "user"
@@ -54,7 +55,10 @@ print(df[['Actual_Load']].describe())
 df_numeric = df[['MTU (CET/CEST)', 'Actual_Load', 'Forecast_Load']]
 
 # Resample the data to weekly averages
-df_weekly = df_numeric.resample('W', on='MTU (CET/CEST)').mean()
+df_weekly = df_numeric.resample('W', on='MTU (CET/CEST)').sum()
+
+def millions2(x, pos):
+    return f'{x * 1e-6:.2f}M'  # Convert to millions and add 'M'
 
 # Plot daily average actual vs forecasted load
 df_weekly[['Actual_Load', 'Forecast_Load']].plot(figsize=(12, 6), marker='o', linestyle='-')
@@ -63,6 +67,7 @@ plt.xlabel('Date')
 plt.ylabel('Load (MW)')
 plt.legend()
 plt.grid(axis='y', linestyle='--', alpha=0.6)
+plt.gca().yaxis.set_major_formatter(FuncFormatter(millions2))
 plt.show()
 
 # Calculate and plot daily average forecast error
