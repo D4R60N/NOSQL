@@ -1,8 +1,8 @@
 services:
 
-## Router
+  ## Router
   router1:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: router-1
@@ -15,7 +15,7 @@ services:
       - mongodb_cluster_router1_db:/data/db
       - mongodb_cluster_router1_config:/data/configdb
   router2:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: router-2
@@ -29,16 +29,31 @@ services:
     restart: always
     links:
       - router1
+  router3:
+    build:
+      context: mongodb-build
+    image: jin-mongo:6.0.2
+    container_name: router-3
+    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /data/mongodb-keyfile
+    ports:
+      - 27131:27017
+    restart: always
+    volumes:
+      - ./scripts:/scripts
+      - mongodb_cluster_router3_db:/data/db
+      - mongodb_cluster_router3_config:/data/configdb
+    links:
+      - router1
 
-## Config Servers
+  ## Config Servers
   configsvr1:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: mongo-config-1
     command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /data/mongodb-keyfile
     volumes:
-      - ./scripts:/scripts 
+      - ./scripts:/scripts
       - mongodb_cluster_configsvr1_db:/data/db
       - mongodb_cluster_configsvr1_config:/data/configdb
     ports:
@@ -51,7 +66,7 @@ services:
       - configsvr2
       - configsvr3
   configsvr2:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: mongo-config-2
@@ -64,7 +79,7 @@ services:
       - 27120:27017
     restart: always
   configsvr3:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: mongo-config-3
@@ -78,13 +93,13 @@ services:
     restart: always
 
 
-## Shards
-  ## Shards 01
-   
+    ## Shards
+    ## Shards 01
+
   shard1-0:
-    build: 
+    build:
       context: mongodb-build
-    image: jin-mongo:6.0.2 
+    image: jin-mongo:6.0.2
     container_name: shard-1-node-0
     command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /data/mongodb-keyfile
     volumes:
@@ -98,7 +113,7 @@ services:
       - shard1-1
       - shard1-2
   shard1-1:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: shard-1-node-1
@@ -111,7 +126,7 @@ services:
       - 27123:27017
     restart: always
   shard1-2:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: shard-1-node-2
@@ -126,7 +141,7 @@ services:
 
   ## Shards 02
   shard2-0:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: shard-2-node-0
@@ -142,7 +157,7 @@ services:
       - shard2-1
       - shard2-2
   shard2-1:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: shard-2-node-1
@@ -155,7 +170,7 @@ services:
       - 27126:27017
     restart: always
   shard2-2:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: shard-2-node-2
@@ -170,7 +185,7 @@ services:
 
   ## Shards 03
   shard3-0:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: shard-3-node-0
@@ -186,7 +201,7 @@ services:
       - shard3-1
       - shard3-2
   shard3-1:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: shard-3-node-1
@@ -199,7 +214,7 @@ services:
       - 27129:27017
     restart: always
   shard3-2:
-    build: 
+    build:
       context: mongodb-build
     image: jin-mongo:6.0.2
     container_name: shard-3-node-2
@@ -254,3 +269,6 @@ volumes:
   
   mongodb_cluster_shard3_2_db:
   mongodb_cluster_shard3_2_config:
+
+  mongodb_cluster_router3_db:
+  mongodb_cluster_router3_config:

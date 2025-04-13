@@ -19,4 +19,9 @@ docker-compose exec shard2-0 bash "/scripts/auth.js"
 docker-compose exec shard3-0 bash "/scripts/auth.js"
 
 docker exec -it router-1 bash -c "echo 'sh.status()' | mongosh --port 27017 -u 'user' -p 'user' --authenticationDatabase admin"
-docker-compose exec router1 mongosh --port 27017 -u "user" -p "user" --authenticationDatabase admin
+docker-compose exec router1 mongosh --port 27017 -u "user" -p "user" --authenticationDatabase admin --eval '
+  sh.enableSharding("Transparency");
+  db.adminCommand({ shardCollection: "Transparency.Load", key: { "Area": 1, "MTU (CET/CEST)": 1 } });
+  db.adminCommand({ shardCollection: "Transparency.Prices", key: { "Area": 1, "MTU (CET/CEST)": 1 } });
+  db.adminCommand({ shardCollection: "Transparency.Production", key: { "Area": 1, "MTU (CET/CEST)": 1, "Production Type": 1 } });
+'
