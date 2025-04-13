@@ -1,7 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
-import matplotlib.dates as mdates
 from pymongo import MongoClient
 
 mongo_user = "user"
