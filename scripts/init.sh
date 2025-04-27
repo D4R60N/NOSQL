@@ -25,3 +25,4 @@ docker-compose exec router1 mongosh --port 27017 -u "user" -p "user" --authentic
   db.adminCommand({ shardCollection: "Transparency.Prices", key: { "Area": 1, "MTU (CET/CEST)": 1 } });
   db.adminCommand({ shardCollection: "Transparency.Production", key: { "Area": 1, "MTU (CET/CEST)": 1, "Production Type": 1 } });
 '
+echo "Finished."
