@@ -1,4 +1,4 @@
-FROM mongo:6.0.2
+FROM mongo:latest
 COPY /auth/mongodb-keyfile /data
-RUN chmod 400 /data/mongodb-keyfile
+RUN chmod 600 /data/mongodb-keyfile
 RUN chown 999:999 /data/mongodb-keyfile

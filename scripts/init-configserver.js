@@ -8,17 +8,17 @@ var config = {
 	"members": [
 		{
 			"_id": 0,
-			"host": "configsvr01:27017",
+			"host": "configsvr1:27017",
 			"priority": 1
 		},
 		{
 			"_id": 1,
-			"host": "configsvr02:27017",
+			"host": "configsvr2:27017",
 			"priority": 0.5
 		},
 		{
 			"_id": 2,
-			"host": "configsvr03:27017",
+			"host": "configsvr3:27017",
 			"priority": 0.5
 		}
 	]
