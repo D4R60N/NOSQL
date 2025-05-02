@@ -1,274 +1,268 @@
+version: '3.9'
+
 services:
 
-  ## Router
+  ## Routers
   router1:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: router-1
-    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /mongodb-build/auth/mongodb-keyfile"
     ports:
       - 27117:27017
-    restart: always
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_router1_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_router1_config:/data/configdb
+    restart: always
+    networks:
+      - mongo-cluster
+
   router2:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: router-2
-    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27118:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_router2_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_router2_config:/data/configdb
-    ports:
-      - 27118:27017
     restart: always
-    links:
-      - router1
+    networks:
+      - mongo-cluster
+
   router3:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: router-3
-    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /mongodb-build/auth/mongodb-keyfile"
     ports:
       - 27131:27017
-    restart: always
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_router3_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_router3_config:/data/configdb
-    links:
-      - router1
+    restart: always
+    networks:
+      - mongo-cluster
 
   ## Config Servers
   configsvr1:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: mongo-config-1
-    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27119:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_configsvr1_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_configsvr1_config:/data/configdb
-    ports:
-      - 27119:27017
     restart: always
-    links:
-      - shard1-0
-      - shard2-0
-      - shard3-0
-      - configsvr2
-      - configsvr3
+    networks:
+      - mongo-cluster
+
   configsvr2:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: mongo-config-2
-    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27120:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_configsvr2_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_configsvr2_config:/data/configdb
-    ports:
-      - 27120:27017
     restart: always
+    networks:
+      - mongo-cluster
+
   configsvr3:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: mongo-config-3
-    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27121:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_configsvr3_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_configsvr3_config:/data/configdb
-    ports:
-      - 27121:27017
     restart: always
+    networks:
+      - mongo-cluster
 
-
-    ## Shards
-    ## Shards 01
-
+  ## Shard 1
   shard1-0:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-1-node-0
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27122:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard1_0_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard1_0_config:/data/configdb
-    ports:
-      - 27122:27017
     restart: always
-    links:
-      - shard1-1
-      - shard1-2
+    networks:
+      - mongo-cluster
+
   shard1-1:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-1-node-1
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27123:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard1_1_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard1_1_config:/data/configdb
-    ports:
-      - 27123:27017
     restart: always
+    networks:
+      - mongo-cluster
+
   shard1-2:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-1-node-2
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27124:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard1_2_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard1_2_config:/data/configdb
-    ports:
-      - 27124:27017
     restart: always
+    networks:
+      - mongo-cluster
 
-  ## Shards 02
+  ## Shard 2
   shard2-0:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-2-node-0
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27125:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard2_0_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard2_0_config:/data/configdb
-    ports:
-      - 27125:27017
     restart: always
-    links:
-      - shard2-1
-      - shard2-2
+    networks:
+      - mongo-cluster
+
   shard2-1:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-2-node-1
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27126:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard2_1_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard2_1_config:/data/configdb
-    ports:
-      - 27126:27017
     restart: always
+    networks:
+      - mongo-cluster
+
   shard2-2:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-2-node-2
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27127:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard2_2_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard2_2_config:/data/configdb
-    ports:
-      - 27127:27017
     restart: always
+    networks:
+      - mongo-cluster
 
-  ## Shards 03
+  ## Shard 3
   shard3-0:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-3-node-0
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27128:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard3_0_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard3_0_config:/data/configdb
-    ports:
-      - 27128:27017
     restart: always
-    links:
-      - shard3-1
-      - shard3-2
+    networks:
+      - mongo-cluster
+
   shard3-1:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-3-node-1
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27129:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard3_1_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard3_1_config:/data/configdb
-    ports:
-      - 27129:27017
     restart: always
+    networks:
+      - mongo-cluster
+
   shard3-2:
-    build:
-      context: mongodb-build
-    image: jin-mongo:6.0.2
+    image: mongo:latest
     container_name: shard-3-node-2
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /data/mongodb-keyfile
+    command: bash -c "chmod 600 /mongodb-build/auth/mongodb-keyfile && mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /mongodb-build/auth/mongodb-keyfile"
+    ports:
+      - 27130:27017
     volumes:
       - ./scripts:/scripts
       - mongodb_cluster_shard3_2_db:/data/db
+      - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile
       - mongodb_cluster_shard3_2_config:/data/configdb
-    ports:
-      - 27130:27017
     restart: always
+    networks:
+      - mongo-cluster
 
 volumes:
   mongodb_cluster_router1_db:
   mongodb_cluster_router1_config:
-  
   mongodb_cluster_router2_db:
   mongodb_cluster_router2_config:
-  
+  mongodb_cluster_router3_db:
+  mongodb_cluster_router3_config:
   mongodb_cluster_configsvr1_db:
   mongodb_cluster_configsvr1_config:
-  
   mongodb_cluster_configsvr2_db:
   mongodb_cluster_configsvr2_config:
-  
   mongodb_cluster_configsvr3_db:
   mongodb_cluster_configsvr3_config:
-  
   mongodb_cluster_shard1_0_db:
   mongodb_cluster_shard1_0_config:
-  
   mongodb_cluster_shard1_1_db:
   mongodb_cluster_shard1_1_config:
-  
   mongodb_cluster_shard1_2_db:
   mongodb_cluster_shard1_2_config:
-  
   mongodb_cluster_shard2_0_db:
   mongodb_cluster_shard2_0_config:
-
   mongodb_cluster_shard2_1_db:
   mongodb_cluster_shard2_1_config:
-  
   mongodb_cluster_shard2_2_db:
   mongodb_cluster_shard2_2_config:
-  
   mongodb_cluster_shard3_0_db:
   mongodb_cluster_shard3_0_config:
-  
   mongodb_cluster_shard3_1_db:
   mongodb_cluster_shard3_1_config:
-  
   mongodb_cluster_shard3_2_db:
   mongodb_cluster_shard3_2_config:
 
-  mongodb_cluster_router3_db:
-  mongodb_cluster_router3_config:
+networks:
+  mongo-cluster:
