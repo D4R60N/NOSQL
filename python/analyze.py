@@ -17,7 +17,7 @@ load_data = list(load_collection.find())
 df_load = pd.DataFrame(load_data)
 df_load.drop(columns=['_id'], inplace=True, errors='ignore')
 df_load['MTU (CET/CEST)'] = df_load['MTU (CET/CEST)'].str.split(' - ').str[0].str.strip()
-df_load['MTU (CET/CEST)'] = pd.to_datetime(df_load['MTU (CET/CEST)'], format='%d/%m/%Y %H:%M', errors='coerce')
+df_load['MTU (CET/CEST)'] = pd.to_datetime(df_load['MTU (CET/CEST)'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
 
 df_load.rename(columns={
     'Actual Total Load (MW)': 'Actual_Load',
