@@ -1,7 +1,7 @@
 use Transparency;
 
 // indexy
-db.Load.createIndex({"MTU (CET/CEST)": 1});
+db.Load.createIndex({"Actual Total Load (MW)": 1});
 // složený index
 db.Production.createIndex({"Production Type": 1, "MTU (CET/CEST)": 1});
 
@@ -25,11 +25,37 @@ db.Production.aggregate([
     { $match: { "Production Type": "Nuclear" } },
     { $merge: { into: "NuclearProduction" } }
 ]);
+//odstřanění N/A hodnot
+db.Load.aggregate([
+    { $match: { $nor: [
+        { "Actual Total Load (MW)": "n/e" },
+        { "Day-ahead Total Load Forecast (MW)": "n/e" }
+            ]} },
+    { $out: "LoadClean" }
+]);
+db.Production.aggregate([
+    { $match: { "Generation (MW)": { $ne: "n/e" } } },
+    { $out: "ProductionClean" }
+]);
 
 // agregační funkce
-// průměrná hodnota
+// rozdíl mezy skutečnou a předpovězenou spotřebou zagregováno na dny (dny jsou od 00:00 do 23:00) seřazeno podle difference
 db.Load.aggregate([
-    { $group: { _id: "$Area", averageLoad: { $avg: "$Actual Total Load (MW)" } } }
+    { $sort: { _id: -1 } },
+    {
+        $group: {
+            _id: { $substr: ["$MTU (CET/CEST)", 0, 10] },
+            actualLoad: { $sum: "$Actual Total Load (MW)" },
+            forecastLoad: { $sum: "$Day-ahead Total Load Forecast (MW)" }
+        }
+    },
+    {
+        $project: {
+            _id: 1,
+            difference: { $subtract: ["$actualLoad", "$forecastLoad"] }
+        }
+    },
+    { $sort: { difference: -1 } }
 ]);
 // počet n/e hodnot
 db.Production.aggregate([
@@ -58,6 +84,85 @@ db.Load.aggregate([
         }
     }
 ]);
+// nalezení top 10 nejdražších dní z hlediska ceny (dny jsou od 00:00 do 23:00)
+db.Prices.aggregate([
+    { $group: { _id: { $substr: ["$MTU (CET/CEST)", 0, 10] }, averagePrice: { $avg: "$Day-ahead Price (EUR/MWh)" } } },
+    { $sort: { averagePrice: -1 } },
+    { $limit: 10 }
+]);
+
+// výpočet celkem peněz vydělaných za každý měsíc cena*spotřeba a spotřeba
+db.LoadClean.aggregate([
+    { $lookup: {
+        from: "Prices",
+        localField: "MTU (CET/CEST)",
+        foreignField: "MTU (CET/CEST)",
+        as: "price"
+    }},
+    { $unwind: "$price" },
+    {
+        $group: {
+            _id: { $substr: ["$MTU (CET/CEST)", 3, 7] },
+            totalMoney: { $sum: { $multiply: ["$Actual Total Load (MW)", "$price.Day-ahead Price (EUR/MWh)"] } },
+            totalLoad: { $sum: "$Actual Total Load (MW)" }
+        }
+    },
+    { $project: { _id: 1, totalMoney: 1, totalLoad: 1 } },
+    { $sort: { _id: 1 } }
+]);
+
+// najdi nejvyšší cenu a vypočti podíly typu výroby na celkové výrobě
+db.Prices.aggregate([
+    { $sort: { "Day-ahead Price (EUR/MWh)": -1 } },
+    { $limit: 1 },
+    { $lookup: {
+        from: "ProductionClean",
+        localField: "MTU (CET/CEST)",
+        foreignField: "MTU (CET/CEST)",
+        as: "production"
+    }},
+    { $unwind: "$production" },
+    {
+        $group: {
+            _id: "$MTU (CET/CEST)" ,
+            maxPrice: { $max: "$Day-ahead Price (EUR/MWh)" },
+            totalProduction: { $sum: "$production.Generation (MW)" },
+            productionType: { $push: { type: "$production.Production Type", generation: "$production.Generation (MW)" } }
+        }
+    },
+    {
+        $project: {
+            _id: 1,
+            maxPrice: 1,
+            totalProduction: 1,
+            productionType: {
+                $map: {
+                    input: "$productionType",
+                    as: "type",
+                    in: {
+                        type: "$$type.type",
+                        share: { $divide: ["$$type.generation", "$totalProduction"] }
+                    }
+                }
+            }
+        }
+    },
+    {
+        $set: {
+            productionType: {
+                $sortArray: {
+                    input: "$productionType",
+                    sortBy: { share: -1 }
+                }
+            }
+        }
+    }
+]);
+
+
+
+
+
 
 // konfigurace
 // sharding

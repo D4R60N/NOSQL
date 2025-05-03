@@ -13,9 +13,9 @@ mongo_collection_production = "Production"
 client = MongoClient(f"mongodb://{mongo_user}:{mongo_password}@127.0.0.1:27117,127.0.0.1:27118/?authMechanism=DEFAULT")
 
 # Input data file (JSON format)
-data_load = "../data/Transparency.Load.json"
-data_prices = "../data/Transparency.Prices.json"
-data_production = "../data/Transparency.Production.json"
+data_load = "../import/Transparency.Load.json"
+data_prices = "../import/Transparency.Prices.json"
+data_production = "../import/Transparency.Production.json"
 
 # Access the target database and collection
 db = client[mongo_db]

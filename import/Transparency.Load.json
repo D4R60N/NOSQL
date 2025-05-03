@@ -43754,7 +43754,7 @@
     {
         "MTU (CET/CEST)": "31/10/2023 20:00:00 - 31/10/2023 21:00:00",
         "Area": "BZN|CZ",
-        "Actual Total Load (MW)": "N/A",
+        "Actual Total Load (MW)": "n/e",
         "Day-ahead Total Load Forecast (MW)": 7438
     },
     {
