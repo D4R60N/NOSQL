@@ -3,7 +3,7 @@ services:
 
   ## Router
   router1:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: router-1
     command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /mongodb-build/auth/mongodb-keyfile
     ports:
@@ -15,7 +15,7 @@ services:
       - ./mongodb-build/auth/mongodb-keyfile:/mongodb-build/auth/mongodb-keyfile:ro
       - ./data/mongodb_cluster_router1_config:/data/configdb
   router2:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: router-2
     command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -29,7 +29,7 @@ services:
     links:
       - router1
   router3:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: router-3
     command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /mongodb-build/auth/mongodb-keyfile
     ports:
@@ -45,7 +45,7 @@ services:
 
   ## Config Servers
   configsvr1:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: mongo-config-1
     command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -63,7 +63,7 @@ services:
       - configsvr2
       - configsvr3
   configsvr2:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: mongo-config-2
     command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -75,7 +75,7 @@ services:
       - 27120:27017
     restart: always
   configsvr3:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: mongo-config-3
     command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -90,7 +90,7 @@ services:
 
     ## Shards
   shard1-0:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-1-node-0
     command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -105,7 +105,7 @@ services:
       - shard1-1
       - shard1-2
   shard1-1:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-1-node-1
     command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -117,7 +117,7 @@ services:
       - 27123:27017
     restart: always
   shard1-2:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-1-node-2
     command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -130,7 +130,7 @@ services:
     restart: always
 
   shard2-0:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-2-node-0
     command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -145,7 +145,7 @@ services:
       - shard2-1
       - shard2-2
   shard2-1:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-2-node-1
     command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -157,7 +157,7 @@ services:
       - 27126:27017
     restart: always
   shard2-2:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-2-node-2
     command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -170,7 +170,7 @@ services:
     restart: always
 
   shard3-0:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-3-node-0
     command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -185,7 +185,7 @@ services:
       - shard3-1
       - shard3-2
   shard3-1:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-3-node-1
     command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -197,7 +197,7 @@ services:
       - 27129:27017
     restart: always
   shard3-2:
-    image: mongo:latest
+    image: mongo:8.0.9
     container_name: shard-3-node-2
     command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /mongodb-build/auth/mongodb-keyfile
     volumes:
@@ -215,6 +215,9 @@ volumes:
 
   mongodb_cluster_router2_db:
   mongodb_cluster_router2_config:
+
+  mongodb_cluster_router3_db:
+  mongodb_cluster_router3_config:
 
   mongodb_cluster_configsvr1_db:
   mongodb_cluster_configsvr1_config:
@@ -251,6 +254,3 @@ volumes:
 
   mongodb_cluster_shard3_2_db:
   mongodb_cluster_shard3_2_config:
-
-  mongodb_cluster_router3_db:
-  mongodb_cluster_router3_config:

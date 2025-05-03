@@ -1,7 +1,14 @@
 #!/bin/bash
+rm -rf ./data/*
+rm ./mongodb-build/auth/mongodb-keyfile
+openssl rand -base64 756 > ./mongodb-build/auth/mongodb-keyfile
+chmod 600 ./mongodb-build/auth/mongodb-keyfile
+chown 999:999 ./mongodb-build/auth/mongodb-keyfile
+
 docker-compose up -d
 echo "Running startup script..."
 
+sleep 10
 docker-compose exec configsvr1 bash "/scripts/init-configserver.js"
 sleep 10
 
@@ -11,7 +18,7 @@ docker-compose exec shard3-0 bash "/scripts/init-shard3.js"
 sleep 10
 
 docker-compose exec router1 sh -c "mongosh < /scripts/init-router.js"
-sleep 10  # Add a delay if necessary
+sleep 10
 
 docker-compose exec configsvr1 bash "/scripts/auth.js"
 docker-compose exec shard1-0 bash "/scripts/auth.js"
