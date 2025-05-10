@@ -1,9 +1,9 @@
 #!/bin/bash
 rm -rf ./data/*
-rm ./mongodb-build/auth/mongodb-keyfile
-openssl rand -base64 756 > ./mongodb-build/auth/mongodb-keyfile
-chmod 600 ./mongodb-build/auth/mongodb-keyfile
-chown 999:999 ./mongodb-build/auth/mongodb-keyfile
+rm ./keyfile/auth/mongodb-keyfile
+openssl rand -base64 756 > ./keyfile/auth/mongodb-keyfile
+chmod 600 ./keyfile/auth/mongodb-keyfile
+chown 999:999 ./keyfile/auth/mongodb-keyfile
 
 docker-compose up -d
 echo "Running startup script..."
