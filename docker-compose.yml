@@ -5,23 +5,23 @@ services:
   router1:
     image: mongo:8.0.9
     container_name: router-1
-    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /keyfile/mongodb-keyfile
     ports:
       - 27117:27017
     restart: always
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_router1_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_router1_config:/data/configdb
   router2:
     image: mongo:8.0.9
     container_name: router-2
-    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_router2_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_router2_config:/data/configdb
     ports:
       - 27118:27017
@@ -31,14 +31,14 @@ services:
   router3:
     image: mongo:8.0.9
     container_name: router-3
-    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongos --port 27017 --configdb rs-config-server/configsvr1:27017,configsvr2:27017,configsvr3:27017 --bind_ip_all --keyFile /keyfile/mongodb-keyfile
     ports:
       - 27131:27017
     restart: always
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_router3_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_router3_config:/data/configdb
     links:
       - router1
@@ -47,11 +47,11 @@ services:
   configsvr1:
     image: mongo:8.0.9
     container_name: mongo-config-1
-    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_configsvr1_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_configsvr1_config:/data/configdb
     ports:
       - 27119:27017
@@ -65,11 +65,11 @@ services:
   configsvr2:
     image: mongo:8.0.9
     container_name: mongo-config-2
-    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_configsvr2_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_configsvr2_config:/data/configdb
     ports:
       - 27120:27017
@@ -77,11 +77,11 @@ services:
   configsvr3:
     image: mongo:8.0.9
     container_name: mongo-config-3
-    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --configsvr --replSet rs-config-server --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_configsvr3_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_configsvr3_config:/data/configdb
     ports:
       - 27121:27017
@@ -92,11 +92,11 @@ services:
   shard1-0:
     image: mongo:8.0.9
     container_name: shard-1-node-0
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard1_0_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard1_0_config:/data/configdb
     ports:
       - 27122:27017
@@ -107,11 +107,11 @@ services:
   shard1-1:
     image: mongo:8.0.9
     container_name: shard-1-node-1
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard1_1_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard1_1_config:/data/configdb
     ports:
       - 27123:27017
@@ -119,11 +119,11 @@ services:
   shard1-2:
     image: mongo:8.0.9
     container_name: shard-1-node-2
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-1 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard1_2_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard1_2_config:/data/configdb
     ports:
       - 27124:27017
@@ -132,11 +132,11 @@ services:
   shard2-0:
     image: mongo:8.0.9
     container_name: shard-2-node-0
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard2_0_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard2_0_config:/data/configdb
     ports:
       - 27125:27017
@@ -147,11 +147,11 @@ services:
   shard2-1:
     image: mongo:8.0.9
     container_name: shard-2-node-1
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard2_1_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard2_1_config:/data/configdb
     ports:
       - 27126:27017
@@ -159,11 +159,11 @@ services:
   shard2-2:
     image: mongo:8.0.9
     container_name: shard-2-node-2
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-2 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard2_2_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard2_2_config:/data/configdb
     ports:
       - 27127:27017
@@ -172,11 +172,11 @@ services:
   shard3-0:
     image: mongo:8.0.9
     container_name: shard-3-node-0
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard3_0_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard3_0_config:/data/configdb
     ports:
       - 27128:27017
@@ -187,11 +187,11 @@ services:
   shard3-1:
     image: mongo:8.0.9
     container_name: shard-3-node-1
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard3_1_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard3_1_config:/data/configdb
     ports:
       - 27129:27017
@@ -199,11 +199,11 @@ services:
   shard3-2:
     image: mongo:8.0.9
     container_name: shard-3-node-2
-    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /keyfile/auth/mongodb-keyfile
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-3 --keyFile /keyfile/mongodb-keyfile
     volumes:
       - ./scripts:/scripts
       - ./data/mongodb_cluster_shard3_2_db:/data/db
-      - ./keyfile/auth/mongodb-keyfile:/keyfile/auth/mongodb-keyfile:ro
+      - ./keyfile/mongodb-keyfile:/keyfile/mongodb-keyfile:ro
       - ./data/mongodb_cluster_shard3_2_config:/data/configdb
     ports:
       - 27130:27017

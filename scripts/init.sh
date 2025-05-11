@@ -1,9 +1,9 @@
 #!/bin/bash
 rm -rf ./data/*
-rm ./keyfile/auth/mongodb-keyfile
-openssl rand -base64 756 > ./keyfile/auth/mongodb-keyfile
-chmod 600 ./keyfile/auth/mongodb-keyfile
-chown 999:999 ./keyfile/auth/mongodb-keyfile
+rm ./keyfile/mongodb-keyfile
+openssl rand -base64 756 > ./keyfile/mongodb-keyfile
+chmod 600 ./keyfile/mongodb-keyfile
+chown 999:999 ./keyfile/mongodb-keyfile
 
 docker-compose up -d
 echo "Running startup script..."
@@ -25,7 +25,7 @@ docker-compose exec shard1-0 bash "/scripts/auth.js"
 docker-compose exec shard2-0 bash "/scripts/auth.js"
 docker-compose exec shard3-0 bash "/scripts/auth.js"
 
-docker exec -it router-1 bash -c "echo 'sh.status()' | mongosh --port 27017 -u 'user' -p 'user' --authenticationDatabase admin"
+docker-compose exec router1 bash -c "echo 'sh.status()' | mongosh --port 27017 -u 'user' -p 'user' --authenticationDatabase admin"
 docker-compose exec router1 mongosh --port 27017 -u "user" -p "user" --authenticationDatabase admin --eval "
   db = db.getSiblingDB('Transparency');
   db.createCollection('Prices', {
@@ -74,8 +74,8 @@ docker-compose exec router1 mongosh --port 27017 -u "user" -p "user" --authentic
 
   sh.enableSharding('Transparency');
 
-  db.adminCommand({ shardCollection: 'Transparency.Load', key: { 'Area': 1, 'MTU (CET/CEST)': 1 } });
-  db.adminCommand({ shardCollection: 'Transparency.Prices', key: { 'Area': 1, 'MTU (CET/CEST)': 1 } });
-  db.adminCommand({ shardCollection: 'Transparency.Production', key: { 'Area': 1, 'MTU (CET/CEST)': 1, 'Production Type': 1 } });
+  db.adminCommand({ shardCollection: 'Transparency.Load', key: { 'MTU (CET/CEST)': 'hashed' } });
+  db.adminCommand({ shardCollection: 'Transparency.Prices', key: { 'MTU (CET/CEST)': 'hashed' } });
+  db.adminCommand({ shardCollection: 'Transparency.Production', key: { 'MTU (CET/CEST)': 'hashed' } });
 "
 echo "Finished."
