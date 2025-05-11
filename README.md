@@ -7,3 +7,6 @@ analýza dat přes ./python/analyze.py
 data jsou ve složce ./import
 dotazy jsou ve složce ./dotazy
 
+možná bude nutné provést
+find . -type f -print0 | xargs -0 dos2unix
+
